@@ -115,13 +115,13 @@ analytics:
 author:
   name             : "Ramil K"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Pentester Enthusiast"
+  bio              : "A collection of my pentesting writeups and more"
   location         : "DE | HB "
   email            : "lamsxapa@proton.me"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:lamsxapa@proton.me"
+      # url: "mailto:lamsxapa@proton.me"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
