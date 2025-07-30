@@ -1,5 +1,5 @@
 ---
-title: "HTB Poison"
+title: "HTB Poison Writeup"
 date: 2025-07-30
 tags:
   - HTB
