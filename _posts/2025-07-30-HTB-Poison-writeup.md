@@ -64,5 +64,6 @@ With the tunnel set up, I tried to connect with vncviewer. I remembered the secr
 
 I put two and two together and ran vncviewer with the secret file and It worked perfectly! I got a VNC session running as root, and from there, I grabbed the final flag.
 
-<img width="2031" height="468" alt="Снимок экрана 2025-07-30 165212" src="https://github.com/user-attachments/assets/ed16e554-75f7-477b-ab96-2cbf6cede2c9" />
+<img width="2031" height="468" alt="Снимок экрана 2025-07-30 165212" src="https://github.com/user-attachments/assets/f777742c-8286-47e4-b1ae-48d2fe16bc1c" />
+
 
