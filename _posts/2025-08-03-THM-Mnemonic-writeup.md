@@ -1,3 +1,10 @@
+---
+title: "THM Mnemonic Writeup"
+date: 2025-08-03
+tags:
+  - THM
+  - Mnemonic
+---
 # Enumeration
 
 I started with an Nmap scan and found three open ports: FTP (21), HTTP (80), and a non-standard SSH port on 1337. The Nmap results suggested it was an Ubuntu machine.
@@ -64,6 +71,8 @@ The /admin path led to a static login page where none of the functions worked. I
 ## Getting a Foothold
 
 1. Cracking the Backup
+<img width="867" height="171" alt="2025-08-03 131013" src="https://github.com/user-attachments/assets/d257bc79-3397-4f6c-8032-e93932bb0dbd" />
+
 
 The backup.zip file was password protected. I used zip2john to extract the hash and then crack the hash with the rockyou.txt wordlist. After a few seconds I had the password.
 
@@ -84,7 +93,8 @@ we have to work hard
 2. From Backup to FTP Access
 
 The note didn't include a password, so I figured I had to brute-force it. I used Hydra with the rockyou.txt wordlist against the ftpuser account, and after a few minutes, it successfully found the password.
-<img width="3009" height="362" alt="2025-08-03 132545" src="https://github.com/user-attachments/assets/2893815c-a890-4b29-9224-4cdb84139baf" />
+
+<img width="3009" height="362" alt="2025-08-03 132545" src="https://github.com/user-attachments/assets/9bcb7aea-7a36-47ac-a2bf-097031774446" />
 
 
 3. From FTP to a Protected SSH Key
@@ -115,13 +125,16 @@ Press 'q' or Ctrl-C to abort, almost any other key for status
 Use the "--show" option to display all of the cracked passwords reliably
 Session completed. 
 ```
-I tried to log in again with the key and the newly found passphrase, but I was still asked for a password. Luckily I tried using the passphrase as the password itself and it worked!
+I tried to log in again with the key and the newly found passphrase, but I was still asked for a ssh password despite my private key. Luckily I tried using the passphrase as the password itself and it worked!
+
 <img width="1550" height="1271" alt="2025-08-03 134319" src="https://github.com/user-attachments/assets/8bee2ebf-cfe7-4d76-b4df-0f78454ef131" />
 
-As soon as I logged in, a warning message popped up saying an IPS had detected me and my shell would be closed in about two minutes. I also quickly realized I was in a restricted bash shell (rbash), which meant many commands like cd were disabled.
+As soon as I logged in, a warning message popped up saying an IPS had detected me and my shell would be closed in about two minutes. I also quickly realized I was in a restricted bash shell, which meant many commands like cd were disabled.
+
 <img width="1127" height="723" alt="2025-08-03 134450" src="https://github.com/user-attachments/assets/57e7aa15-3b0a-4a17-886b-557da1e5176d" />
 
-I had to act fast. In my short sessions, I managed to grab two files: 6450.txt (which contained a long list of numbers) and noteforjames.txt. The second note was important—it mentioned a new "Mnemonic" encryption.
+I had to act fast. I managed to grab two files: 6450.txt (which contained a long list of numbers) and noteforjames.txt. The second note was important—it mentioned a new "Mnemonic" encryption.
+
 ```
 james@mnemonic:~$ cat 6450.txt
 5140656
@@ -139,6 +152,7 @@ james@mnemonic:~$ cat 6450.txt
 24617538
 3567438
 15355494
+
 james@mnemonic:~$ cat noteforjames.txt
 noteforjames.txt
 
@@ -173,9 +187,11 @@ I decoded them with base64 on my local machine. One was a URL to an image, and t
 
 ## Pivoting to condor
 Opening the URL i see a picture.
+
 <img width="2730" height="1592" alt="2025-08-03 143707" src="https://github.com/user-attachments/assets/deee4c7d-aae1-40d9-b6fe-645a651604e4" />
 
 I downloaded the image from the URL, but steghide and exiftool found nothing hidden in it. I remembered the note mentioning "Mnemonic encryption" and the 6450.txt file full of numbers. I searched online and found a GitHub repository for a Mnemonic-based encryption tool that uses an image and a list of numbers.
+
 <img width="1366" height="1164" alt="2025-08-03 144055" src="https://github.com/user-attachments/assets/8f4cb8e1-daaf-46bd-86d8-7718ff6d3c4d" />
 
 This looked promising. I used the script from the repository, providing the numbers from 6450.txt and the image as inputs. The script successfully decrypted the password for the user condor.
@@ -183,14 +199,16 @@ This looked promising. I used the script from the repository, providing the numb
 
 ## Privilege Escalation to Root
 
-I logged in as condor and checked my privileges with sudo -l. It showed that I could run /bin/examplecode.py as root.
+I logged in as condor and checked my privileges with `sudo -l`. It showed that I could run `/bin/examplecode.py` as root.
 
 <img width="1995" height="231" alt="2025-08-03 152214" src="https://github.com/user-attachments/assets/53937984-6358-43cb-8c6b-1afb8e329211" />
 
 I inspected the Python script and found a obvious vulnerability.
 <img width="1238" height="261" alt="2025-08-03 153248" src="https://github.com/user-attachments/assets/d704fb53-e723-4f42-b168-149574136dd5" />
+
 by entering a single period (.) instead of an expected confirmation input like yes or y, it is possible to execute arbitrary commands with root privileges.
 So i will just type bash after . and get root shell.
+
 <img width="797" height="362" alt="2025-08-03 153747" src="https://github.com/user-attachments/assets/ef4ddf7b-f99a-4bd5-8a53-7f6fb0be47c5" />
 
 From there, I had a root shell. I grabbed the final flag, which needed to be MD5-hashed to be accepted and the machine was done.
