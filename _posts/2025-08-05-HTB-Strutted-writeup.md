@@ -86,7 +86,7 @@ Looking up vulnerabilities for Struts 6.3.0.1, I found CVE 2023-50164.
 
 >A critical RCE vuln (CVE-2023-50164, CVSS 9.8) lets attackers manipulate file upload params to gain RCE.
 
-I tried this [[https://github.com/jakabakos/CVE-2023-50164-Apache-Struts-RCE|this PoC]], but at first, it didn’t work
+[I tried this PoC](https://github.com/jakabakos/CVE-2023-50164-Apache-Struts-RCE), but at first, it didn’t work.
 
 ```bash
 └─$ python3 exploit.py --url http://strutted.htb/
