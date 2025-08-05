@@ -121,7 +121,7 @@ bash: cannot set terminal process group (1): Inappropriate ioctl for device
 bash: no job control in this shell           
 root@7ce659d667d7:~# ls                    
 ```
-While doing ыщьу basic enumeration stuff, i ran `env` to check environment variables  and found credentials:
+While doing some basic enumeration stuff, i ran `env` to check environment variables  and found credentials:
 
 <img width="1661" height="630" alt="2025-08-05 180639" src="https://github.com/user-attachments/assets/f565149e-dbdf-4919-93a4-02d58dbb4aca" />
 
