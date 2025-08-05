@@ -186,7 +186,7 @@ It’s a Crontab GUI, and based on the /opt/crontabs/crontab.db, it's runs as ro
 From here its pretty easy, I will add a simply entry that modifies the /etc/passwd file to remove root password
 <img width="1205" height="1163" alt="2025-08-05 194444" src="https://github.com/user-attachments/assets/ad7768f8-9d0b-41fd-b738-ebbc3d65be60" />
 
-Waited a bit and then checked /etc/passwd. It worked. 
+Waited a bit and then switched to user. It worked and didn`t asked password. 
 
 <img width="654" height="105" alt="2025-08-05 194544" src="https://github.com/user-attachments/assets/005b957c-a160-4ff4-88a2-f9449fd3e6f8" />
 
