@@ -22,7 +22,7 @@ title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Ramil K."
 description              : "Portfolio von Ramil K., CPTS-zertifizierter Penetration Tester aus Bremen. Fokus: Web-App & Netzwerk-Sicherheit, Schwachstellenanalyse. Offen für IT-Sicherheits-Positionen in Deutschland."
-url                      : "blueberryp1ll.github.io"
+url                      : "https://blueberryp1ll.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
@@ -102,9 +102,6 @@ social:
   type                   : # Person or Organization (defaults to Person)
   name                   : # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
-    - label: "Hack The Box"
-      icon: "fas fa-fw fa-cube"
-      url: "https://app.hackthebox.com/users/blueberryp1ll"
 # Analytics
 analytics:
   provider               : # false (default), "google", "google-universal", "google-gtag", "custom"
@@ -123,7 +120,10 @@ author:
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      # url: "mailto:lamsxapa@proton.me"
+      url: "mailto:lamsxapa@proton.me"
+    - label: "Hack The Box"
+      icon: "fas fa-fw fa-cube"
+      url: "https://app.hackthebox.com/users/blueberryp1ll"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
