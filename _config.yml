@@ -21,7 +21,7 @@ title                    : "BlUEBERRYP1ll | Cybersecurity Portfolio "
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Ramil K."
-description              : "CPTS certified. A collection of my pentesting writeups."
+description              : "Portfolio von Ramil K., CPTS-zertifizierter Penetration Tester aus Bremen. Fokus: Web-App & Netzwerk-Sicherheit, Schwachstellenanalyse. Offen für IT-Sicherheits-Positionen in Deutschland."
 url                      : "blueberryp1ll.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -102,7 +102,9 @@ social:
   type                   : # Person or Organization (defaults to Person)
   name                   : # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
-
+    - label: "Hack The Box"
+      icon: "fas fa-fw fa-cube"
+      url: "https://app.hackthebox.com/users/blueberryp1ll"
 # Analytics
 analytics:
   provider               : # false (default), "google", "google-universal", "google-gtag", "custom"
@@ -115,7 +117,7 @@ analytics:
 author:
   name             : "Ramil K"
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "A collection of my pentesting writeups and more"
+  bio              : "CPTS certified. A collection of my pentesting writeups."
   location         : "DE | HB "
   email            : "lamsxapa@proton.me"
   links:
