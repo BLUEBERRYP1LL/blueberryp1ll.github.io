@@ -1,6 +1,5 @@
-title: "THM: Year of the Fox Writeup"
-:------------------------------------------------------------------------------------------------------------------------------- |
-| **Platform**            | TryHackMe                                                                                                                    |
+| **Machine**             | \[Year of The Fox]     
+| **Platform**            | TryHackMe                                                                                                                    
 | **Difficulty**          | Hard                                                                                                                           |
 | **Key Concept**         |  `Enumeration, Null SMB Sessions, HTTP Basic Auth Brute-Force, Command Injection, Client-Side Filter Bypass, Reverse Shell, Pivoting, Chisel, Hydra Brute-Force, Sudo Privilege Escalation, PATH Hijacking` |
 
