@@ -2,7 +2,7 @@
 | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
 | **Platform**            | Hack The Box                                                                                                                     |
 | **Difficulty**          | Medium                                                                                                                           |
-| **Key Concepts**        | Rsync Enumeration, Jenkins Credential Decryption, Gitea, Reverse Shell, Chisel Pivoting, MySQL Credential Extraction, Privilege Escalation|
+| **Key Concepts**        | Nmap, .git Source Code Recovery, Token Secret, JWT Forging, API Fuzzing, Command Injection, Reverse Shell, SSH Persistence, SUID Binary Exploitation, Root Privilege Escalation |
 
 # Enumeration
 Running nmap reveals three open ports:
