@@ -270,7 +270,7 @@ This means that if I can get count to open a file I normally can’t access (e.g
 # Exploitation Steps
 1. Run the binary and open the target file:
 I chose /root/.viminfo because it’s world-readable but normally inaccessible due to /root directory permissions, once the stat are printed, i background it with CTRL+Z
-```bash
+
 ```bash
 dasith@secret:/opt$ ./count
 Enter source file/directory name: /root/.viminfo
