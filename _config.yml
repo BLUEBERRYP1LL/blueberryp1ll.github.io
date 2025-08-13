@@ -116,7 +116,7 @@ author:
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "CPTS certified. A collection of my pentesting writeups."
   location         : "DE | HB "
-  email            : "lamsxapa@proton.me"
+  email            : #"lamsxapa@proton.me"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
