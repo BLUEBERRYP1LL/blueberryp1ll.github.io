@@ -343,3 +343,7 @@ defaults:
       dark_skin: "dark"
       # Dies aktiviert den Button
       dark_skin_toggle: true 
+# Footer-Skripte (werden am Ende der Seite geladen)
+footer_scripts:
+  - https://cdn.jsdelivr.net/npm/typed.js@2.0.12
+  - /assets/js/custom-scripts.js # Unsere eigene Skript-Datei  
