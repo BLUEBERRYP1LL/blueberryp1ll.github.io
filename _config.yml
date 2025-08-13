@@ -338,9 +338,9 @@ defaults:
       sidebar:
         nav: "main"
       # Der Skin, der standardmäßig geladen wird
-      skin: "default" 
-      # Der Skin, zu dem gewechselt wird, wenn man auf den Mond klickt
-      dark_skin: "dark"
+      skin: "dark" # <--- HIER "dark" eintragen
+      # Der Skin, zu dem gewechselt wird, wenn man auf den Mond/Sonne klickt
+      dark_skin: "default" # <--- HIER "default" eintragen
       # Dies aktiviert den Button
       dark_skin_toggle: true 
 # Footer-Skripte (werden am Ende der Seite geladen)
