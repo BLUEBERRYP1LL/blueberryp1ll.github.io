@@ -12,7 +12,7 @@
 
 # theme                  : "minimal-mistakes-jekyll"
 remote_theme           : "mmistakes/minimal-mistakes"
-minimal_mistakes_skin    : "dark" #"air", "aqua", "contrast", #"default", "dirt", "neon", "mint", "plum", "sunrise"
+#minimal_mistakes_skin    : "dark" #"air", "aqua", "contrast", #"default", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
 locale                   : "en-US"
@@ -118,9 +118,6 @@ author:
   location         : "DE | HB "
   email            : #"lamsxapa@proton.me"
   links:
-    - label: "Email"
-      icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:lamsxapa@proton.me"
     - label: "Hack The Box"
       icon: "fas fa-fw fa-cube"
       url: "https://app.hackthebox.com/users/1478207"
