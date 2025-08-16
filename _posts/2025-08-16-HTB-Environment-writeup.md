@@ -2,7 +2,7 @@
 | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
 | **Platform**            | Hack The Box                                                                                                                     |
 | **Difficulty**          | Medium                                                                                                                           |
-| Key Vulnerabilities | Authentication bypass via Laravel environment override (?--env=preprod), Unrestricted file upload → PHP RCE (magic-bytes check bypass), Credentials disclosure via exposed GnuPG keyring (keyvault.gpg), Privilege escalation via sudo env_keep+="ENV BASH_ENV" (BASH_ENV sourced by root script) || **Tools Used**          | `nmap, ffuf, Burp Suite, Python, nc, curl, env, ss, ssh`
+| Key Vulnerabilities | Authentication bypass via Laravel environment override (?--env=preprod), Unrestricted file upload → PHP RCE (magic-bytes check bypass), Credentials disclosure via exposed GnuPG keyring (keyvault.gpg), Privilege escalation via sudo env_keep+="ENV BASH_ENV" (BASH_ENV sourced by root script) |
 | Tools Used | nmap, ffuf, Burp Suite, sqlite3, gpg, hashcat, busybox nc, ssh, tar, file |
 
 ## Reconnaissance
