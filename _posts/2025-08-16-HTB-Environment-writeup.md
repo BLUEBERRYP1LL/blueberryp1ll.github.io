@@ -161,10 +161,13 @@ I will from here try to get a reverse shell with busybox nc, and it worked!  I j
 
 At /app/database I found an SQLite database, and inside the users table there are hashes
 
-```sqlite
+```bash
 www-data@environment:~/app/database$ ls
 database.sqlite  factories  migrations  seeders
 www-data@environment:~/app/database$ sqlite3 database.sqlite 
+
+```sqlite
+
 SQLite version 3.40.1 2022-12-28 14:03:47
 Enter ".help" for usage hints.
 sqlite> .tables
