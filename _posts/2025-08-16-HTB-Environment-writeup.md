@@ -1,9 +1,10 @@
-| **Machine**             | Environment                                                                                                               |
-| :---------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| **Platform**            | Hack The Box                                                                                                                     |
-| **Difficulty**          | Medium                                                                                                                           |
-| Key Vulnerabilities | Authentication bypass via Laravel environment override (?--env=preprod), Unrestricted file upload → PHP RCE (magic-bytes check bypass), Credentials disclosure via exposed GnuPG keyring (keyvault.gpg), Privilege escalation via sudo env_keep+="ENV BASH_ENV" (BASH_ENV sourced by root script) |
-| Tools Used | nmap, ffuf, Burp Suite, sqlite3, gpg, hashcat, busybox nc, ssh, tar, file |
+| **Machine** | CodeTwo |
+|---|---|
+| **Platform** | Hack The Box |
+| **Difficulty** | Easy |
+| **Key Vulnerabilities** | RCE via js2py sandbox escape (CVE-2024-28397) in `run_code`; source code disclosure (downloadable bundle) enabling white-box analysis; weak password hashing (MD5); privilege escalation via `sudo`|
+| **Tools Used** | nmap; Burp Suite; js2py PoC; nc; Python; wget; sqlite3; hashcat; ssh |
+
 
 ## Reconnaissance
 We start with Nmap to discover open ports on the machine.
