@@ -1,9 +1,10 @@
-| **Machine**             | CodeTwo                                                                                                               |
-| :---------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| **Platform**            | Hack The Box                                                                                                                     |
-| **Difficulty**          | Easy                                                                                                                           |
-| Key Vulnerabilities | RCE via js2py sandbox escape (CVE-2024-28397) in run_code, Source code disclosure (downloadable bundle) enabling white-box analysis, Weak password hashing (MD5) → offline crack → SSH reuse, Privilege escalation via sudo NOPASSWD /usr/local/bin/npbackup-cli (executes post_exec_commands from attacker-supplied config) |
-| Tools Used | nmap, Burp Suite, js2py PoC, nc, Python, wget, sqlite3, hashcat, ssh |
+| **Machine**             | CodeTwo      |                                                                                                            
+| **Platform**            | Hack The Box |                                                                                                                     
+
+| **Difficulty**          | Easy         |                                                                                                                
+| **Key Vulnerabilities**    | RCE via js2py CVE-2024-28397; source code disclosure; weak password hashing; privilege escalation via sudo |
+| **Tools Used** | nmap, ffuf, Burp Suite, sqlite3, gpg, hashcat, busybox nc, ssh, tar, file |
+
 ## Reconnaissance
 
 Running Nmap, we see two ports open: SSH and HTTP on port 8000, which is running Gunicorn version 20.0.4.
