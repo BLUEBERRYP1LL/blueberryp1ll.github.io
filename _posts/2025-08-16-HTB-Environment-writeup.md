@@ -1,9 +1,9 @@
-| **Machine** | CodeTwo |
+| **Machine**       | CodeTwo                  |
 |---|---|
-| **Platform** | Hack The Box |
-| **Difficulty** | Easy |
+| **Platform**      | Hack The Box             |
+| **Difficulty**    | Easy                     |
 | **Key Vulnerabilities** | RCE via js2py sandbox escape (CVE-2024-28397) in `run_code`; source code disclosure (downloadable bundle) enabling white-box analysis; weak password hashing (MD5); privilege escalation via `sudo`|
-| **Tools Used** | nmap; Burp Suite; js2py PoC; nc; Python; wget; sqlite3; hashcat; ssh |
+| **Tools Used**    | nmap; Burp Suite; js2py PoC; nc; Python; wget; sqlite3; hashcat; ssh |
 
 
 ## Reconnaissance
